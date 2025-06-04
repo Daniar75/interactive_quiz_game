@@ -14,7 +14,7 @@ let score = 0;
 let gameRunning = false;
 let lives = 3;
 
-let timeLeft = 60;
+let timeLeft = 15;
 const timerDisplay = document.createElement('div');
 timerDisplay.id = 'timerDisplay';
 document.body.appendChild(timerDisplay);
@@ -231,7 +231,7 @@ function gameOver() {
 
 
 function resetGame() {
-    timeLeft = 60;
+    timeLeft = 15;
 updateTimer();
     score = 0;
     lives = 3;
