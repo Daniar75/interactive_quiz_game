@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Программистская Викторина Galaxian</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+
+    <div id="scoreDisplay">Очки: 0</div>
+    <div id="questionDisplay"></div>
+    
+    <div id="highScoresScreen" style="display: none;">
+        <h2>Таблица рекордов</h2>
+        <ul id="highScoresList"></ul>
+        <button onclick="backToMenu()">Назад в меню</button>
+    </div>
+    
+    <div id="startScreen">
+        <h1>Программистская Викторина Galaxian</h1>
+        <p>Управляйте кораблём с помощью мыши и стреляйте в правильные ответы!</p>
+        <button id="startButton">Начать игру</button>
+        <button onclick="showHighScores()">Таблица рекордов</button>
+
+    </div>
+    
+    <div id="gameOverScreen">
+        <h1>Игра окончена!</h1>
+        <p id="finalScore">Ваш счёт: 0</p>
+        <button id="restartButton">Играть снова</button>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
