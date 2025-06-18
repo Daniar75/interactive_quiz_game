@@ -14,7 +14,7 @@ let score = 0;
 let gameRunning = false;
 let lives = 3;
 
-let timeLeft = 60;
+let timeLeft = 30;
 const timerDisplay = document.createElement('div');
 timerDisplay.id = 'timerDisplay';
 document.body.appendChild(timerDisplay);
@@ -213,25 +213,36 @@ function gameOver() {
     finalScore.textContent = `Ваш счёт: ${score}`;
     gameOverScreen.style.display = 'flex';
 
-    const name = prompt("Введите ваше имя:");
-
-    if (name) {
-        fetch('/api/score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name, score: score })
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Счёт сохранён!", data);
-        })
-        .catch(err => console.error("Ошибка сохранения счёта:", err));
+    const name = prompt("Введите ваше имя:", "Игрок");
+    if (name !== null) {
+        saveScoreToLocalStorage(name, score);
     }
 }
 
+// function gameOver() {
+//     gameRunning = false;
+//     finalScore.textContent = `Ваш счёт: ${score}`;
+//     gameOverScreen.style.display = 'flex';
+
+//     const name = prompt("Введите ваше имя:");
+
+//     if (name) {
+//         fetch('/api/score', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ name: name, score: score })
+//         })
+//         .then(res => res.json())
+//         .then(data => {
+//             console.log("Счёт сохранён!", data);
+//         })
+//         .catch(err => console.error("Ошибка сохранения счёта:", err));
+//     }
+// }
+
 
 function resetGame() {
-    timeLeft = 60;
+    timeLeft = 30;
 updateTimer();
     score = 0;
     lives = 3;
@@ -345,4 +356,79 @@ window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     player.y = canvas.height - 50;
+});
+
+// Функция сохранения результата
+function saveScoreToLocalStorage(name, score) {
+    const highscores = JSON.parse(localStorage.getItem('gameHighscores')) || [];
+    highscores.push({ 
+        name: name || "Игрок", 
+        score, 
+        date: new Date().toLocaleDateString() 
+    });
+    highscores.sort((a, b) => b.score - a.score);
+    const top10 = highscores.slice(0, 10);
+    localStorage.setItem('gameHighscores', JSON.stringify(top10));
+    return top10;
+}
+
+// Функция отображения результатов
+function displayLocalHighscores() {
+    // Получаем сохраненные результаты из LocalStorage
+    const highscores = JSON.parse(localStorage.getItem('gameHighscores')) || [];
+    const highScoresList = document.getElementById('highScoresList');
+    
+    // Очищаем список перед добавлением новых элементов
+    highScoresList.innerHTML = '';
+    
+    // Если результатов нет, показываем сообщение
+    if (highscores.length === 0) {
+        const emptyItem = document.createElement('li');
+        emptyItem.textContent = 'Пока нет сохранённых результатов';
+        highScoresList.appendChild(emptyItem);
+        return;
+    }
+    
+    // Добавляем каждый результат в список
+    highscores.forEach((score, index) => {
+        const listItem = document.createElement('li');
+        
+        // Форматируем запись (место, имя, очки, дата)
+        listItem.textContent = `${index + 1}. ${score.name} - ${score.score} очков (${score.date})`;
+        
+        // Добавляем классы для стилизации (опционально)
+        listItem.classList.add('score-item');
+        if (index === 0) listItem.classList.add('top-score');
+        
+        highScoresList.appendChild(listItem);
+    });
+}
+
+// Обновлённая функция gameOver
+function gameOver() {
+    gameRunning = false;
+    finalScore.textContent = `Ваш счёт: ${score}`;
+    gameOverScreen.style.display = 'flex';
+
+    const name = prompt("Введите ваше имя:", "Игрок");
+    if (name !== null) { // Проверяем, что пользователь не нажал "Отмена"
+        saveScoreToLocalStorage(name, score);
+        displayLocalHighscores();
+    }
+}
+
+// Обновлённая функция showHighScores
+function showHighScores() {
+    startScreen.style.display = 'none';
+    gameOverScreen.style.display = 'none';
+    document.getElementById('highScoresScreen').style.display = 'flex';
+    displayLocalHighscores(); 
+}
+
+// Обработчик кнопки сброса (если добавили такую кнопку)
+document.getElementById('resetScoresButton')?.addEventListener('click', () => {
+    if (confirm('Вы уверены, что хотите сбросить все сохранённые результаты?')) {
+        localStorage.removeItem('gameHighscores');
+        displayLocalHighscores();
+    }
 });
